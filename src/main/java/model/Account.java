@@ -5,7 +5,7 @@ public class Account {
     private String login, name, surname;
 
     public Account() {
-        new Account("", "", "");
+        this("", "", "");
     }
 
     public Account(String login, String name, String surname) {
@@ -18,24 +18,12 @@ public class Account {
         return login;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getSurname() {
         return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
     }
 
     public boolean isEmpty() {
@@ -45,8 +33,20 @@ public class Account {
     @Override
     public String toString() {
         return new StringBuilder()
-                .append(getLogin()).append(" ")
-                .append(getName()).append(" ")
-                .append(getSurname()).toString();
+                .append("\n")
+                .append("| ").append(getSeparator(getLogin().length())).append(" | ").append(getSeparator(getName().length())).append(" | ").append(getSeparator(getSurname().length())).append(" |\n")
+                .append("| ").append(getLogin()).append(" | ").append(getName()).append(" | ").append(getSurname()).append(" |\n")
+                .append("| ").append(getSeparator(getLogin().length())).append(" | ").append(getSeparator(getName().length())).append(" | ").append(getSeparator(getSurname().length())).append(" |")
+                .toString();
+    }
+
+    private String getSeparator(int point) {
+        String separator = "";
+        int i = 0;
+        while (i < point) {
+            separator += " ";
+            i++;
+        }
+        return separator;
     }
 }

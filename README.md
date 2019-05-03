@@ -19,12 +19,3 @@ $ mvn package
 
 $ java -jar (Path to project)/target/accountManagementDB.jar
 
-
-
-## help
-
-usage:
-
-    --help, print help
-        
-    --quit, end program

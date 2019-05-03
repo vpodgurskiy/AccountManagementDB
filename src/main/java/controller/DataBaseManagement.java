@@ -11,19 +11,19 @@ public class DataBaseManagement {
     @Transactional
     public Account insertInDB(String login, String name, String surname) throws SQLException {
         final String query = String.format("INSERT INTO activedirectory (login, name, surname) VALUES ('%s', '%s', '%s');", login, name, surname);
-        return getModefideAccountFromDB(query, login);
+        return getModifiedAccountFromDB(query, login);
     }
 
     @Transactional
     public Account deleteFromDB(String login) throws SQLException {
         final String query = String.format("DELETE FROM activedirectory WHERE login = '%s';", login);
-        return getModefideAccountFromDB(query, login);
+        return getModifiedAccountFromDB(query, login);
     }
 
     @Transactional
     public Account updateInDB(String login, String surname) throws SQLException {
         final String query = String.format("UPDATE activedirectory SET surname = '%s' WHERE login = '%s';", surname, login);
-        return getModefideAccountFromDB(query, login);
+        return getModifiedAccountFromDB(query, login);
     }
 
     @Transactional
@@ -44,7 +44,7 @@ public class DataBaseManagement {
     }
 
     @Transactional
-    public Account getModefideAccountFromDB(final String query, final String login) throws SQLException {
+    public Account getModifiedAccountFromDB(final String query, final String login) throws SQLException {
         Account account = new Account();
         DataBaseConnector dataBaseConnector = new DataBaseConnector();
         int result = dataBaseConnector.createDBConnection().executeUpdateQuery(query);
