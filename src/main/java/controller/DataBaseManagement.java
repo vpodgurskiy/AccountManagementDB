@@ -3,34 +3,59 @@ package controller;
 import model.Account;
 
 import javax.transaction.Transactional;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
+@Transactional
 public class DataBaseManagement {
 
-    @Transactional
     public Account insertInDB(String login, String name, String surname) throws SQLException {
-        final String query = String.format("INSERT INTO activedirectory (login, name, surname) VALUES ('%s', '%s', '%s');", login, name, surname);
-        return getModifiedAccountFromDB(query, login);
+        final String queryInsert = String.format("INSERT INTO activedirectory (login, name, surname) VALUES ('%s', '%s', '%s');", login, name, surname);
+        DataBaseConnector dataBaseConnector = new DataBaseConnector();
+        Connection connection = dataBaseConnector.ConnectToDB();
+        Statement stmt = connection.createStatement();
+        int countUpdated = stmt.executeUpdate(queryInsert);
+        final String querySelect = String.format("SELECT * FROM ACTIVEDIRECTORY WHERE LOGIN = '%s';", login);
+        Account account = getModifiedAccountFromDB(querySelect, login, stmt);
+        stmt.close();
+        connection.close();
+        return account;
     }
 
-    @Transactional
     public Account deleteFromDB(String login) throws SQLException {
-        final String query = String.format("DELETE FROM activedirectory WHERE login = '%s';", login);
-        return getModifiedAccountFromDB(query, login);
+        final String queryDelete = String.format("DELETE FROM activedirectory WHERE login = '%s';", login);
+        DataBaseConnector dataBaseConnector = new DataBaseConnector();
+        Connection connection = dataBaseConnector.ConnectToDB();
+        Statement stmt = connection.createStatement();
+        int countUpdated = stmt.executeUpdate(queryDelete);
+        final String querySelect = String.format("SELECT * FROM ACTIVEDIRECTORY WHERE LOGIN = '%s';", login);
+        Account account = getModifiedAccountFromDB(querySelect, login, stmt);
+        stmt.close();
+        connection.close();
+        return account;
     }
 
-    @Transactional
     public Account updateInDB(String login, String surname) throws SQLException {
-        final String query = String.format("UPDATE activedirectory SET surname = '%s' WHERE login = '%s';", surname, login);
-        return getModifiedAccountFromDB(query, login);
+        final String queryUpdate = String.format("UPDATE activedirectory SET surname = '%s' WHERE login = '%s';", surname, login);
+        DataBaseConnector dataBaseConnector = new DataBaseConnector();
+        Connection connection = dataBaseConnector.ConnectToDB();
+        Statement stmt = connection.createStatement();
+        int countUpdated = stmt.executeUpdate(queryUpdate);
+        final String querySelect = String.format("SELECT * FROM ACTIVEDIRECTORY WHERE LOGIN = '%s';", login);
+        Account account = getModifiedAccountFromDB(querySelect, login, stmt);
+        stmt.close();
+        connection.close();
+        return account;
     }
 
-    @Transactional
     public Account selectFromDB(String login) throws SQLException {
         final String query = String.format("SELECT * FROM ACTIVEDIRECTORY WHERE LOGIN = '%s';", login);
         DataBaseConnector dataBaseConnector = new DataBaseConnector();
-        ResultSet resultSet = dataBaseConnector.createDBConnection().executeQuery(query);
+        Connection connection = dataBaseConnector.ConnectToDB();
+        Statement stmt = connection.createStatement();
+        ResultSet resultSet = stmt.executeQuery(query);
         String loginDB = "";
         String nameDB = "";
         String surnameDB = "";
@@ -39,20 +64,24 @@ public class DataBaseManagement {
             nameDB = resultSet.getString("name");
             surnameDB = resultSet.getString("surname");
         }
-        dataBaseConnector.closeConnection();
+        resultSet.close();
+        stmt.close();
+        connection.close();
         return new Account(loginDB, nameDB, surnameDB);
     }
 
-    @Transactional
-    public Account getModifiedAccountFromDB(final String query, final String login) throws SQLException {
-        Account account = new Account();
-        DataBaseConnector dataBaseConnector = new DataBaseConnector();
-        int result = dataBaseConnector.createDBConnection().executeUpdateQuery(query);
-        if (result == 1) {
-            account = selectFromDB(login);
-        }
-        dataBaseConnector.closeConnection();
 
-        return account;
+    private Account getModifiedAccountFromDB(final String query, final String login, Statement stmt) throws SQLException {
+        ResultSet resultSet = stmt.executeQuery(query);
+        String loginDB = "";
+        String nameDB = "";
+        String surnameDB = "";
+        while (resultSet.next()) {
+            loginDB = resultSet.getString("login");
+            nameDB = resultSet.getString("name");
+            surnameDB = resultSet.getString("surname");
+        }
+        resultSet.close();
+        return new Account(loginDB, nameDB, surnameDB);
     }
 }
